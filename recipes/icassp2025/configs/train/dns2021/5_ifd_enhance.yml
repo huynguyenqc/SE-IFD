@@ -1,0 +1,56 @@
+n_epochs: 20
+iter_per_checkpoint:
+epoch_per_val: 2
+epoch_per_checkpoint: 2
+optimiser:  # For Adam optimiser
+  lr: 5.3e-4
+  weight_decay: 1.e-5
+scheduler: # For OneCycle scheduler
+  max_lr: 5.3e-4
+  div_factor: 25
+  final_div_factor: 2500
+  steps_per_epoch: 18768  # This must be qual to floor(data_len / batch_size)
+  epochs: 20  # This must be equal to the number of epochs
+  pct_start: 0.1
+init_state_dict_path:
+train_dataset:
+  name: AugmentedNoisyDataset
+  configs:  # 600607 speech samples
+    name: AugmentedNoisyDataset
+    clean_path: cfgs/dns2021_speech.txt
+    clean_limit:
+    clean_offset: 0
+    noise_path: cfgs/dns2021_noise.txt
+    noise_limit:
+    noise_offset: 0
+    rir_path: cfgs/dns2021_rir.txt
+    rir_limit:
+    rir_offset: 0
+    snr_range: [-5, 20]
+    reverb_proportion: 0.5
+    silence_sec: 0.2
+    target_dB_FS: -27.5
+    target_dB_FS_floating_value: 7.5
+    sub_sample_sec: 1.58125
+    sr: 16000
+validation_dataset:
+  name: PreSyntheticNoisyDataset
+  configs:
+    name: PreSyntheticNoisyDataset
+    clean_noisy_path: cfgs/valentini_val.txt
+    clean_noisy_limit:
+    clean_noisy_offset: 0
+    sr: 16000
+train_dataloader:
+  batch_size: 32
+  num_workers: 16
+  pin_memory: True
+  drop_last: True
+  shuffle: True
+validation_dataloader:
+  batch_size: 1
+  num_workers: 0
+  pin_memory: False
+  drop_last: False
+  shuffle: False
+auto_mix_precision: False

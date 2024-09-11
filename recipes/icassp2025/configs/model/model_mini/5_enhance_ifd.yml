@@ -1,0 +1,111 @@
+name: FrameWiseCorrectPhaseWithIFDMask
+configs:
+  name: FrameWiseCorrectPhaseWithIFDMask
+  stft_configs:
+    win_len: 400
+    hop_len: 100
+    fft_len: 512
+    win_type: hann
+  speech_estimator_configs:
+    dim: 257
+    vqvae_configs:
+      encoder_configs:
+        encoder_configs:
+          - input_dim: 256
+            output_dim: 192
+            residual_dim: 192
+            gate_dim: 192
+            skip_dim: 192
+            kernel_size: 3
+            dilation_list: [1, 2, 4, 8, 16, 32]
+            n_stages: 1
+            down_sample_factor: 1
+            pad_mode: causal
+            bn_momentum_conv: 0.25
+          - input_dim: 128
+            output_dim: 32
+            residual_dim: 64
+            gate_dim: 64
+            skip_dim: 64
+            kernel_size: 3
+            dilation_list: [4, 8, 16]
+            n_stages: 2
+            down_sample_factor: 1
+            pad_mode: causal
+            bn_momentum_conv: 0.25
+        embedding_dims: [64, 32]
+        use_batchnorm: True
+      quantiser_configs:
+        quantiser_configs:
+          - dim_codebook: 64
+            codebook_size: 1
+          - dim_codebook: 32
+            codebook_size: 1
+      decoder_configs:
+        decoder_configs:
+          - input_dim: 32
+            output_dim: 64
+            residual_dim: 64
+            gate_dim: 64
+            skip_dim: 64
+            kernel_size: 3
+            dilation_list: [2, 4, 8]
+            n_stages: 2
+            up_sample_factor: 1
+            pad_mode: causal
+          - input_dim: 128
+            output_dim: 257
+            residual_dim: 128
+            gate_dim: 128
+            skip_dim: 256
+            kernel_size: 3
+            dilation_list: [1, 2, 4]
+            n_stages: 4
+            up_sample_factor: 1
+            pad_mode: causal
+  noise_estimator_configs:
+    input_type: noisy
+    cond_encoder_configs: 
+      input_dim: 257
+      output_dim: 32
+      residual_dim: 64
+      gate_dim: 64
+      skip_dim: 64
+      kernel_size: 3
+      dilation_list: [1, 2, 4, 8, 16]
+      n_stages: 1
+      down_sample_factor: 1
+      pad_mode: causal
+      bn_momentum_conv: 0.25
+      mini_mode: True
+    decoder_configs:
+      input_dim: 257
+      output_dim: 257
+      residual_dim: 128
+      gate_dim: 128
+      skip_dim: 128
+      kernel_size: 3
+      dilation_list: [1, 2, 4, 8, 16]
+      n_stages: 1
+      up_sample_factor: 1
+      pad_mode: causal
+      cond_dim: 32
+      mini_mode: True
+  ifd_mask_estimator_configs:
+    frame_stft_configs:
+      win_len: 400
+      fft_len: 512
+      win_type: hann
+    look_ahead: 0
+    n_components_taylor: 5
+    ccrnn_configs:
+      dim: 257
+      hidden_dim: 64
+      kernel_size: 3
+      dilation_list: [1, 2, 4]
+      n_stages: 2
+      n_rnn_layers: 1
+      mini_mode: True
+  wiener_type: original
+  do_quantisation: False
+  look_ahead: 1

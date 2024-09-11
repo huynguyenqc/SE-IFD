@@ -1,0 +1,48 @@
+n_epochs: 400
+iter_per_checkpoint:
+epoch_per_val: 20
+epoch_per_checkpoint: 20
+optimiser:  # For Adam optimiser
+  lr: 1.5e-3
+  weight_decay: 1.e-5
+scheduler: # For OneCycle scheduler
+  max_lr: 1.5e-3
+  steps_per_epoch: 45  # This must be qual to floor(data_len / batch_size)
+  epochs: 400  # This must be equal to the number of epochs
+  pct_start: 0.1
+  div_factor: 25
+  final_div_factor: 2500
+init_state_dict_path:
+train_dataset:  # 11492 (pairs of) samples (wav files)
+  name: PreSyntheticNoisyDataset
+  configs:
+    name: PreSyntheticNoisyDataset
+    clean_noisy_path: cfgs/valentini_train.txt
+    clean_noisy_limit:
+    clean_noisy_offset: 0
+    sr: 16000
+    sub_sample_sec: 1.58125
+    target_dB_FS: -27.5
+    target_dB_FS_floating_value: 7.5
+    dynamic_mixing: True
+validation_dataset:
+  name: PreSyntheticNoisyDataset
+  configs:
+    name: PreSyntheticNoisyDataset
+    clean_noisy_path: cfgs/valentini_val.txt
+    clean_noisy_limit:
+    clean_noisy_offset: 0
+    sr: 16000
+train_dataloader:
+  batch_size: 256
+  num_workers: 8
+  pin_memory: True
+  drop_last: True
+  shuffle: True
+validation_dataloader:
+  batch_size: 1
+  num_workers: 0
+  pin_memory: False
+  drop_last: False
+  shuffle: False
+auto_mix_precision: False
